@@ -30,35 +30,39 @@ driver.implicitly_wait(5)
 
 input("sape")
 
+def addReplies():
+    reply_tweets = driver.find_elements(By.XPATH, '//article[@data-testid="tweet"]')
+    for reply_tweet in reply_tweets:
+        username_link = reply_tweet.find_element(By.XPATH, './div/div/div[2]/div[2]/div[1]/div/div[1]/div/div/div[2]/div/div[1]/a')
+        username = username_link.get_attribute('href')
+        if username not in listarespuestas:
+            listarespuestas.append(username)
+
+listarespuestas = []
+addReplies()
+
 last_height = driver.execute_script("return document.body.scrollHeight")
 while True:
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    time.sleep(3) # Espera a que se carguen las respuestas adicionales
+    time.sleep(4)
+    addReplies()
     new_height = driver.execute_script("return document.body.scrollHeight")
     if new_height == last_height:
             break
     last_height = new_height
 
-        
 try:
     show_more_button = driver.find_element(By.XPATH, '//span[contains(text(), "Show more replies")]/ancestor::*[position()=3]')
     action = ActionChains(driver)
     action.move_to_element(show_more_button).click().perform()
-
+    time.sleep(5)
+    addReplies()
 except NoSuchElementException:
     print("no se encontro")
 
 
-reply_tweets = driver.find_elements(By.XPATH, '//article[@data-testid="tweet"]')
 
-# for reply_tweet in reply_tweets:
-    # username_link = reply_tweet.find_element(By.XPATH, './div/div/div[1]/div[1]/div/div/div/div/div/div/div/div/div/a')
-    # username = username_link.get_attribute('href')
-#     print(username)
+print(len(listarespuestas))
+print(listarespuestas)
 
-
-reply_tweet = reply_tweets[5]
-username_link = reply_tweet.find_element(By.XPATH, './div/div/div[2]/div[2]/div[1]/div/div[1]/div/div/div[2]/div/div[1]/a')
-username = username_link.get_attribute('href')
-print(username)
-#4f01cabca155ed5c9df029cd0cce13da422d6052
+#
